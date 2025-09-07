@@ -2,6 +2,8 @@
 
 A cute pet-themed status line plugin for Claude Code that displays your token usage through adorable emoji pets!
 
+<img width="1904" height="840" alt="image" src="https://github.com/user-attachments/assets/5e95d284-4e5a-40a8-840f-97da1a9cf52e" />
+
 ## ✨ Features
 
 - 🐱 **Dynamic Pet States**: Different pet behaviors based on your actual token usage percentage  
