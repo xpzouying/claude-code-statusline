@@ -40,14 +40,27 @@ export function formatTimeRemaining(minutes) {
 // Format account type display
 export function formatAccountType(version) {
   if (!version) return 'Claude Code';
-  if (version.includes('api')) return 'API';
-  if (version.includes('max')) return 'Max Plan';
-  if (version.includes('pro')) return 'Pro Plan';
   
-  // Fallback: capitalize and format any version string
-  return version
-    .replace('claude-code-', '')
-    .replace(/^\w/, c => c.toUpperCase()) + ' Plan';
+  // Convert to lowercase for case-insensitive matching
+  const versionLower = version.toLowerCase();
+  
+  // Check for specific account types
+  if (versionLower.includes('api')) return 'API';
+  if (versionLower.includes('max')) return 'Max Plan';
+  if (versionLower.includes('pro')) return 'Pro Plan';
+  
+  // If it looks like a version number (contains dots and numbers), default to Pro
+  if (/^\d+\.\d+/.test(version)) return 'Pro Plan';
+  
+  // For other text-based identifiers, try to format them
+  if (versionLower.includes('claude-code-')) {
+    return version
+      .replace('claude-code-', '')
+      .replace(/^\w/, c => c.toUpperCase()) + ' Plan';
+  }
+  
+  // Default fallback
+  return 'Claude Code';
 }
 
 // Format currency display

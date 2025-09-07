@@ -21,13 +21,13 @@ function handleCliArgs() {
   const args = process.argv.slice(2);
   
   if (args.includes('--version') || args.includes('-v')) {
-    console.log('1.1.2');
+    console.log('1.1.3');
     process.exit(0);
   }
   
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
-🐾 Claude Code Statusline v1.1.2
+🐾 Claude Code Statusline v1.1.3
 
 A cute pet-themed status line plugin for Claude Code that displays 
 your token usage through adorable emoji pets! Now with international support.
