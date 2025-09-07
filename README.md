@@ -1,147 +1,207 @@
-# 🐾 Claude Code Status Line
+# 🐾 Claude Code Statusline
 
-A collection of cute pet-themed status line plugins for various tools and environments. Transform your boring status bars into delightful displays featuring adorable emoji pets that react to your usage patterns!
+A cute pet-themed status line plugin for Claude Code that displays your token usage through adorable emoji pets!
 
-## 📦 Packages
+## ✨ Features
 
-### [@claude-status-line/core](./packages/core/)
-Core library containing shared pet states, animations, and utilities for building status line plugins.
-
-### [claude-code-statusline](./packages/claude-code/)
-Status line plugin for Claude Code that displays token usage through animated emoji pets.
-
-**Installation:**
-```bash
-npm install -g claude-code-statusline
-```
-
-**Features:**
-- 🐱 Dynamic pet states based on actual token usage percentage
-- 📊 5-hour billing window monitoring with progress bars
-- ⚡ High-performance direct ccusage integration
-- 🌍 International support with English interface
-- 🎨 Beautiful ANSI color-coded visualizations
-
-## 🎯 Coming Soon
-
-### tmux-pet-statusline *(Planned)*
-A tmux status bar plugin featuring the same loveable pets for terminal multiplexer users.
-
-### More Platforms *(Future)*
-- Zsh prompt theme
-- Vim/Neovim statusline
-- Terminal title updates
-
-## 🚀 Quick Start
-
-### For Claude Code Users
-
-1. **Install the plugin:**
-   ```bash
-   npm install -g claude-code-statusline
-   ```
-
-2. **Configure Claude Code:**
-   
-   Add to your `.claude/settings.json`:
-   ```json
-   {
-     "statusLine": {
-       "type": "command", 
-       "command": "claude-code-statusline",
-       "padding": 0
-     }
-   }
-   ```
-
-3. **Enjoy your pet companion!**
-   
-   Your status line will show something like:
-   ```
-   😺 Very active! | 5h: 67% ▓▓▓▓▓▓▓░░░ | 1h 45m left | 💰 $1.34 | Pro Plan
-   ```
+- 🐱 **Dynamic Pet States**: Different pet behaviors based on your actual token usage percentage  
+- 📊 **5-Hour Window Monitoring**: Real-time display of current billing window usage
+- ⏱️ **Time Remaining**: Clear indication of remaining time in the current session
+- 💰 **Cost Tracking**: Live cost updates for your current session
+- 🎨 **Visual Progress Bar**: Intuitive usage visualization with color coding
+- ⚡ **High Performance**: Direct ccusage module integration for faster response
 
 ## 🐱 Pet States
 
-Your emoji pets react intelligently to your usage patterns:
+Your pet reacts to your actual token usage percentage (not burn rate):
 
-| Usage Range | Pet Behavior | Description |
-|-------------|--------------|-------------|
-| 0-10% | 😸😌🐱 **Just Started** | Taking it easy, warming up |
-| 10-30% | 🐱😽😻 **Light Work** | Working casually, nice and steady |
-| 30-60% | 🙀😺😻 **Getting Busy** | Picking up steam, pace quickening |
-| 60-80% | 😺😼😻 **Very Active** | Deeply focused, full of energy |
-| 80-95% | 🤪😼😾 **Intense Mode** | High intensity, going full throttle |
-| 95-100% | 😵😿😰 **Nearly Exhausted** | Pushing limits, hang in there! |
+| Usage | Pet | State | Description |
+|-------|-----|-------|-------------|
+| 0-10% | 😸😌🐱 | Just Started | Taking it easy, just getting warmed up |
+| 10-30% | 🐱😽😻 | Light Work | Working leisurely, nice and steady |
+| 30-60% | 🙀😺😻 | Getting Busy | Picking up the pace, getting focused |
+| 60-80% | 😺😼😻 | Very Active | Working hard, high concentration |
+| 80-95% | 🤪😼😾 | Intense Mode | Full sprint mode, maximum effort |
+| 95-100% | 😵😿😰 | Nearly Exhausted | Almost at the limit, hang in there! |
 
-Plus random special behaviors: 😽 *Stretching*, 😻 *Grooming*, 🥱 *Yawning*, and more!
+Plus random special states: 😽 Stretching, 😻 Grooming, 🥱 Yawning, and more!
 
-## 🛠️ Development
+## 📦 Installation
 
-This is a **monorepo** managed with npm workspaces:
+### Recommended: Global npm Installation
+
+Install directly from npm registry:
 
 ```bash
-# Clone the repository
-git clone https://github.com/xpzouying/claude-code-statusline.git
-cd claude-code-status-line
+# Install globally
+npm install -g claude-code-statusline
 
-# Install all dependencies
+# Verify installation
+claude-code-statusline --version
+```
+
+### Alternative: Local Development
+
+For development or custom modifications:
+
+```bash
+# Clone the project
+git clone https://github.com/xpzouying/claude-code-statusline.git
+cd claude-code-statusline
+
+# Install dependencies
 npm install
 
-# Run tests for all packages
-npm run test
-
-# Work on a specific package
-cd packages/claude-code
-npm run test
+# Link locally for testing
+npm link
 ```
 
-### Project Structure
+## ⚙️ Configuration
 
+### Setup Claude Code
+
+Create or edit `.claude/settings.json` in your project directory:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "claude-code-statusline",
+    "padding": 0
+  }
+}
 ```
-claude-code-status-line/
-├── packages/
-│   ├── core/           # Shared logic and utilities
-│   ├── claude-code/    # Claude Code plugin  
-│   └── tmux/          # Future tmux plugin
-├── docs/              # Documentation
-├── package.json       # Workspace configuration
-└── README.md         # This file
+
+For local development installation:
+
+```json
+{
+  "statusLine": {
+    "type": "command", 
+    "command": "node /path/to/claude-code-statusline/index.js",
+    "padding": 0
+  }
+}
 ```
+
+### Restart Claude Code
+
+After configuration, restart your Claude Code session to see the pet status line.
+
+## 🎯 Examples
+
+Low usage:
+```
+😌 Taking it easy~ | 5h: 8% ▓░░░░░░░░░ | 4h 36m left | 💰 $0.15 | Pro
+```
+
+Medium usage:
+```
+🙀 Getting busy! | 5h: 45% ▓▓▓▓▓░░░░░ | 2h 45m left | 💰 $0.89 | Pro
+```
+
+High usage:
+```
+😾 Super focused! | 5h: 85% ▓▓▓▓▓▓▓▓▓░ | 45m left | 💰 $1.70 | API
+```
+
+Almost exhausted:
+```
+😰 Hang in there! | 5h: 97% ▓▓▓▓▓▓▓▓▓▓ | 9m left | 💰 $1.94 | Pro
+```
+
+## 🧪 Testing
+
+Run the test suite to verify functionality:
+
+```bash
+npm test
+```
+
+## 🔧 Troubleshooting
+
+### Status line not showing
+
+1. Check `.claude/settings.json` format is correct
+2. Ensure script path exists and has execute permissions  
+3. Restart Claude Code session
+
+### Configuration errors
+
+If you see "Expected object, but received string":
+
+❌ **Wrong format**:
+```json
+{
+  "statusLine": "cc-pet-statusline"  
+}
+```
+
+✅ **Correct format**:
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "cc-pet-statusline",
+    "padding": 0
+  }
+}
+```
+
+### Inaccurate data
+
+- Plugin depends on ccusage reading local log files
+- Ensure Claude Code is generating usage logs properly
+- First usage may need some activity before showing accurate data
+
+## 🛠️ Technical Details
+
+### Architecture
+
+- **Node.js 18+**: Runtime environment
+- **ccusage modules**: Direct import for data loading (`ccusage/data-loader`, `ccusage/calculate-cost`)
+- **ANSI Colors**: Terminal color support
+- **Performance**: ~300ms response time with direct module imports
+
+### How it works
+
+1. Claude Code calls the status line script every 300ms
+2. Script receives current session JSON data via stdin
+3. Directly imports ccusage modules to analyze local usage logs  
+4. Calculates pet state based on token usage percentage vs historical maximum
+5. Outputs formatted status line to stdout
+
+### Data Sources
+
+- **Primary**: Direct ccusage module calls for active session blocks
+- **Fallback**: Claude Code provided cost data when ccusage unavailable
+- **Test Mode**: Mock data when session_id starts with 'test-'
+
+## 🚀 Roadmap
+
+- [ ] More pet themes (dogs, birds, etc.)
+- [ ] Customizable usage thresholds  
+- [ ] Historical usage trends
+- [ ] Sound notifications
+- [ ] tmux plugin version
+- [ ] Pixel art animations
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
-
-1. **Report bugs** - Found an issue? Open a GitHub issue
-2. **Request features** - Have ideas for new pet behaviors or platforms? Let us know!
-3. **Submit PRs** - Bug fixes and improvements are always appreciated
-4. **Add translations** - Help us support more languages
-5. **Create new plugins** - Port the pets to other tools and platforms
-
-### Development Guidelines
-
-- Follow the existing code style and patterns
-- Add tests for new features
-- Update documentation for user-facing changes
-- Use the shared `@claude-status-line/core` package for common logic
+Issues and Pull Requests are welcome!
 
 ## 📄 License
 
-MIT License - see [LICENSE](./LICENSE) for details.
+MIT License
 
 ## 🙏 Acknowledgments
 
-- **[ccusage](https://github.com/ryoppippi/ccusage)** by [@ryoppippi](https://github.com/ryoppippi) - Powers the Claude Code integration with excellent token usage analysis
-- **Claude Code Team** - For providing the extensible status line API
-- **Open Source Community** - For inspiration and feedback
+Special thanks to:
 
-## 🔗 Links
+- **[ccusage](https://github.com/ryoppippi/ccusage)** by [@ryoppippi](https://github.com/ryoppippi) - Provides the core token usage analysis and session block functionality that powers this plugin. Without ccusage's excellent data loading and cost calculation modules, this pet status line wouldn't be possible.
 
-- **npm Package**: [`claude-code-statusline`](https://www.npmjs.com/package/claude-code-statusline)
-- **GitHub**: [xpzouying/claude-code-statusline](https://github.com/xpzouying/claude-code-statusline)
-- **Issues**: [Report bugs or request features](https://github.com/xpzouying/claude-code-statusline/issues)
+- **Claude Code Team** - For providing the status line API and extensibility support
 
 ---
 
-Made with ❤️ for developers who love both productivity and cute pets!
+Made with ❤️ for the Claude Code community

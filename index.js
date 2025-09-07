@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { statSync } from 'fs';
-import { getPetState, formatAccountType, createStatusLine } from '@claude-status-line/core';
+import { getPetState } from './animations.js';
+import { formatAccountType, createStatusLine } from './utils.js';
 
 // Import ccusage modules directly
 let loadSessionBlockData, getTotalTokens;
@@ -20,13 +21,13 @@ function handleCliArgs() {
   const args = process.argv.slice(2);
   
   if (args.includes('--version') || args.includes('-v')) {
-    console.log('1.1.1');
+    console.log('1.1.2');
     process.exit(0);
   }
   
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
-🐾 Claude Code Statusline v1.1.1
+🐾 Claude Code Statusline v1.1.2
 
 A cute pet-themed status line plugin for Claude Code that displays 
 your token usage through adorable emoji pets! Now with international support.

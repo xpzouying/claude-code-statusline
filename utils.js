@@ -39,7 +39,15 @@ export function formatTimeRemaining(minutes) {
 
 // Format account type display
 export function formatAccountType(version) {
-  return version?.includes('api') ? 'API' : 'Pro Plan';
+  if (!version) return 'Claude Code';
+  if (version.includes('api')) return 'API';
+  if (version.includes('max')) return 'Max Plan';
+  if (version.includes('pro')) return 'Pro Plan';
+  
+  // Fallback: capitalize and format any version string
+  return version
+    .replace('claude-code-', '')
+    .replace(/^\w/, c => c.toUpperCase()) + ' Plan';
 }
 
 // Format currency display

@@ -1,20 +1,29 @@
 {
-  "name": "claude-code-status-line",
-  "version": "1.1.0",
-  "description": "Pet-themed status line plugins for various tools and environments",
-  "private": true,
+  "name": "claude-code-statusline",
+  "version": "1.1.2",
+  "description": "A cute pet-themed status line plugin for Claude Code that displays your token usage through adorable emoji pets!",
+  "main": "index.js",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "test": "npm run test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "publish:all": "npm publish --workspaces",
-    "version:patch": "npm version patch --workspaces",
-    "version:minor": "npm version minor --workspaces",
-    "version:major": "npm version major --workspaces"
+  "bin": {
+    "claude-code-statusline": "./index.js"
   },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "claude-code",
+    "statusline",
+    "status-line",
+    "token-usage",
+    "pet",
+    "emoji",
+    "claude",
+    "ai",
+    "plugin",
+    "terminal"
+  ],
+  "author": "Claude Code Community",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/xpzouying/claude-code-statusline.git"
@@ -23,21 +32,19 @@
     "url": "https://github.com/xpzouying/claude-code-statusline/issues"
   },
   "homepage": "https://github.com/xpzouying/claude-code-statusline#readme",
-  "keywords": [
-    "statusline",
-    "status-line", 
-    "pet",
-    "emoji",
-    "terminal",
-    "claude-code",
-    "tmux",
-    "animation",
-    "monorepo"
-  ],
-  "author": "Claude Code Community",
-  "license": "MIT",
+  "dependencies": {
+    "ccusage": "^16.0.0"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
-  "devDependencies": {}
+  "files": [
+    "index.js",
+    "animations.js",
+    "pet-states.js", 
+    "utils.js",
+    "test.js",
+    "README.md",
+    "package.json"
+  ]
 }
