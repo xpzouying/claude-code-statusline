@@ -1,25 +1,46 @@
-# 📋 CC Pet Statusline 产品设计文档
+# 🐾 Claude Code Status Line - Product Design Document
 
-## 1. 产品概述
+## 1. Product Overview
 
-### 1.1 产品定位
-CC Pet Statusline 是一款为 Claude Code 用户设计的可视化状态栏插件，通过宠物精灵的形式生动展示 token 使用情况，帮助用户实时掌握 5 小时计费窗口的使用状态。
+### 1.1 Product Positioning
+Claude Code Status Line is a monorepo containing pet-themed status line plugins for various tools and environments. The flagship `claude-code-statusline` plugin transforms boring status bars into delightful displays featuring adorable emoji pets that react to your usage patterns.
 
-### 1.2 核心价值
-- **直观可视化**：将抽象的 token 消耗转化为生动的宠物状态
-- **实时监控**：300ms 更新频率，实时反映使用情况
-- **成本控制**：帮助用户合理控制 API 使用成本
-- **趣味互动**：通过宠物形象增加编程乐趣
+### 1.2 Core Value
+- **Intuitive Visualization**: Transform abstract token consumption into vivid pet states
+- **Real-time Monitoring**: Live tracking of 5-hour billing window usage
+- **Cost Control**: Help users manage API usage costs effectively
+- **Fun Interaction**: Add joy to development through pet companions
+- **Multi-platform Support**: Extensible architecture for various tools (Claude Code, tmux, etc.)
 
-## 2. 技术架构
+## 2. Technical Architecture
 
-### 2.1 技术栈
-- **运行环境**：Node.js 18+
-- **核心依赖**：ccusage（token 统计引擎）
-- **输出格式**：ANSI 颜色代码
-- **数据源**：Claude Code JSONL 日志文件
+### 2.1 Tech Stack
+- **Runtime**: Node.js 18+
+- **Package Manager**: npm workspaces (monorepo)
+- **Core Dependencies**: ccusage (token analysis engine)
+- **Output Format**: ANSI color codes
+- **Data Sources**: ccusage direct imports + Claude Code JSON API
+- **Architecture**: Modular monorepo with shared core library
 
-### 2.2 系统架构
+### 2.2 Monorepo Structure
+```
+claude-code-status-line/              # Monorepo root
+├── packages/
+│   ├── core/                         # @claude-status-line/core
+│   │   ├── pet-states.js            # Pet behavior definitions
+│   │   ├── animations.js            # State management logic
+│   │   └── utils.js                 # Shared utilities
+│   ├── claude-code/                  # claude-code-statusline (npm)
+│   │   ├── index.js                 # Main plugin entry
+│   │   ├── package.json             # Published package
+│   │   └── test.js                  # Integration tests
+│   └── tmux/                         # Future: tmux-pet-statusline
+├── docs/                             # Documentation
+├── package.json                      # Workspace configuration
+└── README.md                         # Monorepo overview
+```
+
+### 2.3 System Architecture
 ```
 ┌─────────────────┐
 │  Claude Code    │
@@ -28,202 +49,261 @@ CC Pet Statusline 是一款为 Claude Code 用户设计的可视化状态栏插�
          │ JSON (stdin)
          ▼
 ┌─────────────────┐
-│  CC Pet Status  │
-│    (index.js)   │
+│ claude-code-    │
+│ statusline      │
+│  (packages/     │
+│   claude-code)  │
+└────────┬────────┘
+         │ import
+         ▼
+┌─────────────────┐
+│ @claude-status- │
+│ line/core       │
+│ (packages/core) │
 └────────┬────────┘
          │
          ├──────────────┐
          ▼              ▼
 ┌─────────────────┐  ┌──────────────┐
 │     ccusage     │  │ Claude Code  │
-│  (blocks mode)  │  │  Cost Data   │
+│  (direct import)│  │  Cost Data   │
 └─────────────────┘  └──────────────┘
          │              │
          └──────┬───────┘
                 ▼
         ┌───────────────┐
-        │  Status Line  │
-        │   (stdout)    │
+        │ Status Line   │
+        │  (stdout)     │
         └───────────────┘
 ```
 
-### 2.3 数据流
-1. Claude Code 通过 stdin 传入会话 JSON 数据
-2. 脚本调用 ccusage blocks 获取 5h 窗口统计
-3. 根据 token 消耗速率计算宠物状态
-4. 输出格式化的状态栏到 stdout
+### 2.4 Data Flow
+1. Claude Code passes session JSON data via stdin
+2. Plugin calls ccusage direct imports for 5h window statistics
+3. Core library calculates pet state based on token consumption rate
+4. Formatted status line output to stdout
 
-## 3. 功能设计
+## 3. Feature Design
 
-### 3.1 猫系动态状态系统
+### 3.1 Dynamic Pet State System
 
-#### 基础状态（动画循环）
-| 状态类别 | 动画帧 | 触发条件 | 动画间隔 |
-|----------|--------|----------|----------|
-| 深度睡眠 | 😴 呼呼大睡中... | 无活动5分钟+ | 12秒 |
-| 轻度打盹 | 😸 迷糊中... / 😌 昏昏欲睡~ / 🥱 哈~欠~ | <5 tokens/min | 8秒 |
-| 慵懒观察 | 🐱 懒洋洋地看着 / 😽 伸个懒腰~ / 😻 整理毛发中 | 5-15 tokens/min | 6秒 |
-| 好奇探索 | 🙀 发现了什么？/ 😺 有点兴致~ / 😻 好奇ing... | 15-50 tokens/min | 5秒 |
-| 兴奋活跃 | 😺 兴致勃勃！/ 😼 专注ing... / 😻 干劲满满！ | 50-150 tokens/min | 4秒 |
-| 疯狂模式 | 🤪 猫咪炸毛了！/ 😼 全力冲刺！/ 😾 疯狂模式ON！ | >150 tokens/min | 3秒 |
-| 精疲力尽 | 😵 累坏了... / 😿 需要休息 / 🙀 快到极限了... | 使用量>95% | 10秒 |
+#### Core States (Animation Cycles)
+| Usage Range | Pet States | Description | Behavior |
+|-------------|------------|-------------|----------|
+| 0-10% | 😸😌🐱 **Just Started** | Taking it easy, warming up | Relaxed animation |
+| 10-30% | 🐱😽😻 **Light Work** | Working casually, nice and steady | Gentle movement |
+| 30-60% | 🙀😺😻 **Getting Busy** | Picking up steam, pace quickening | Active behavior |
+| 60-80% | 😺😼😻 **Very Active** | Deeply focused, full of energy | High activity |
+| 80-95% | 🤪😼😾 **Intense Mode** | High intensity, going full throttle | Intense states |
+| 95-100% | 😵😿😰 **Nearly Exhausted** | Pushing limits, hang in there! | Fatigue indicators |
 
-#### 特殊状态（随机出现，5%概率）
-- 😽 伸个懒腰~ 
-- 😻 整理毛发中
-- 🥱 哈~欠~
-- 😌 满足地眯着眼
-- 🙀 警觉！
+#### Special Behaviors (Random, 5% probability)
+- 😽 Stretching
+- 😻 Grooming
+- 🥱 Yawning
+- 😌 Content
+- 🙀 Alert
 
-### 3.2 信息展示
-- **宠物状态**：动态 emoji + 状态文字
-- **使用百分比**：5h 窗口使用进度
-- **进度条**：彩色可视化进度（绿→黄→红）
-- **剩余时间**：窗口剩余可用时间
-- **花费金额**：当前会话累计成本
-- **账户类型**：Pro 订阅或 API
+### 3.2 Information Display
+- **Pet Status**: Dynamic emoji + status text
+- **Usage Percentage**: 5h window usage progress
+- **Progress Bar**: Color-coded visualization (green → yellow → red)
+- **Remaining Time**: Window remaining available time
+- **Cost Amount**: Current session accumulated cost
+- **Account Type**: Pro subscription or API
 
-### 3.3 双数据源策略
-1. **主数据源**：ccusage blocks 命令（精确）
-2. **备用数据源**：Claude Code cost 字段（估算）
-3. **降级策略**：ccusage 失败时自动切换到备用源
+### 3.3 Dual Data Source Strategy
+1. **Primary Source**: ccusage direct imports (precise)
+2. **Fallback Source**: Claude Code cost field (estimated)
+3. **Graceful Degradation**: Auto-switch to fallback when ccusage fails
 
-## 4. 实现细节
+## 4. Implementation Details
 
-### 4.1 关键算法
+### 4.1 Core Algorithms
 
-#### 使用百分比计算
+#### Usage Percentage Calculation
 ```javascript
-// 基于时间的使用百分比
-const totalMinutes = 300; // 5小时
-const elapsedMinutes = totalMinutes - remainingMinutes;
-const usagePercent = Math.round((elapsedMinutes / totalMinutes) * 100);
+// Based on token usage vs historical maximum
+const maxTokensReference = Math.max(...historicalTokens);
+const usagePercent = Math.min(100, Math.round((currentTokens / maxTokensReference) * 100));
 ```
 
-#### 宠物状态判定
+#### Pet State Logic
 ```javascript
-// 优先使用 burn rate，其次使用百分比
-if (burnRate !== undefined) {
-  // 基于消耗速率的精确判定
-} else {
-  // 基于使用百分比的估算判定
+// Located in @claude-status-line/core
+export function getPetState(usagePercent) {
+  const stateCategory = PET_STATES.find(state => 
+    usagePercent >= state.minUsage && usagePercent <= state.maxUsage
+  );
+  
+  return stateManager.getRandomState(stateCategory);
 }
 ```
 
-### 4.2 性能优化
-- 使用 bunx 替代 npx（提升启动速度）
-- 错误静默处理（2>/dev/null）
-- 轻量级依赖（仅 ccusage）
+### 4.2 Performance Optimizations
+- Direct ccusage module imports (no subprocess overhead)
+- Graceful error handling with fallbacks
+- Modular architecture for code sharing
+- Lightweight dependencies
 
-## 5. 产品迭代计划
+## 5. Product Roadmap
 
-### 5.1 MVP 版本（已完成）✅
-- [x] 猫系动态状态系统
-- [x] 真实动画效果（3-12秒循环）
-- [x] 智能静止检测机制
-- [x] 5h 窗口精确监控
-- [x] 疲劳算法和状态记忆
-- [x] 双数据源降级策略
-- [x] 成本实时追踪
-- [x] Claude Code 完美集成
-- [x] 全自动安装脚本
+### 5.1 V1.1 - Monorepo Architecture ✅ (Current)
+- [x] Monorepo structure with npm workspaces
+- [x] Shared core library (@claude-status-line/core)
+- [x] Professional npm package (claude-code-statusline)
+- [x] English internationalization
+- [x] Direct ccusage imports for performance
+- [x] Comprehensive test suite
+- [x] Global CLI installation
+- [x] Enhanced documentation
 
-### 5.2 V1.0 增强版
-- [ ] 更多宠物形象选择
-- [ ] 自定义阈值配置
-- [ ] 历史统计功能
-- [ ] 性能优化
+### 5.2 V1.2 - Enhanced Features
+- [ ] Additional pet types (dogs, rabbits, etc.)
+- [ ] Custom threshold configuration
+- [ ] Historical usage statistics
+- [ ] Performance monitoring dashboard
+- [ ] Plugin configuration system
 
-### 5.3 V2.0 扩展版
-- [ ] tmux 插件支持
-- [ ] 像素艺术动画
-- [ ] 声音提醒功能
-- [ ] Web Dashboard
+### 5.3 V2.0 - Multi-Platform Expansion
+- [ ] tmux plugin (tmux-pet-statusline)
+- [ ] Zsh prompt theme
+- [ ] Vim/Neovim statusline
+- [ ] Terminal title updates
+- [ ] Unified configuration system
 
-## 6. 安装与配置
+### 5.4 V3.0 - Advanced Features
+- [ ] Pixel art animations
+- [ ] Sound notifications
+- [ ] Web dashboard
+- [ ] Community pet gallery
+- [ ] Plugin marketplace
 
-### 6.1 快速安装
+## 6. Installation & Configuration
+
+### 6.1 Quick Installation (Recommended)
 ```bash
-# 1. 克隆项目
-git clone <repository>
-cd cc-pet-statusline
+# Install globally via npm
+npm install -g claude-code-statusline
 
-# 2. 安装依赖
+# Configure Claude Code
+# Add to .claude/settings.json:
+{
+  "statusLine": {
+    "type": "command",
+    "command": "claude-code-statusline",
+    "padding": 0
+  }
+}
+```
+
+### 6.2 Development Installation
+```bash
+# Clone monorepo
+git clone https://github.com/xpzouying/claude-code-statusline.git
+cd claude-code-status-line
+
+# Install dependencies
 npm install
 
-# 3. 配置 Claude Code
-# 编辑 .claude/settings.json
-{
-  "statusLine": "node /path/to/cc-pet-statusline/index.js"
-}
+# Test functionality
+npm run test
+
+# Install locally for testing
+npm install -g ./packages/claude-code
 ```
 
-### 6.2 自动安装
+## 7. Testing Strategy
+
+### 7.1 Test Architecture
+- **Integration Tests**: `packages/claude-code/test.js` - Simulates various usage scenarios
+- **Monorepo Tests**: `npm run test` - Runs tests across all workspaces
+- **Package Tests**: Individual package testing capabilities
+
+### 7.2 Test Scenarios
+1. **Low Usage** (0-10%): Resting states
+2. **Medium Usage** (20-70%): Active states  
+3. **High Usage** (70-95%): Intense states
+4. **Near Limit** (>95%): Exhausted states
+5. **Fallback Mode**: ccusage unavailable scenarios
+
+### 7.3 Test Coverage
 ```bash
-./install.sh [target-directory]
+🧪 CC Pet Statusline Test Suite
+==================================================
+✓ Low usage (resting) - 😌 Warming up...
+✓ Medium usage (active) - 😻 Pace is quickening  
+✓ High usage (intense) - 😾 Super focused!
+✓ Near limit (exhausted) - 😰 Hang in there!
+==================================================
+All tests passed!
 ```
 
-## 7. 测试策略
+## 8. Success Metrics
 
-### 7.1 单元测试
-- `test.js`：模拟各种使用场景
-- `test-real.js`：真实数据集成测试
+### 8.1 Functional Metrics
+- ✅ Accurately displays 5h window usage status
+- ✅ Pet states reflect real-time consumption rates
+- ✅ Users can intuitively understand remaining usage
+- ✅ Installation completed within 2 minutes
+- ✅ Professional npm package distribution
 
-### 7.2 测试场景
-1. 低使用量（<20%）
-2. 中等使用量（20-70%）
-3. 高使用量（70-95%）
-4. 接近限制（>95%）
-5. 无数据降级
+### 8.2 Performance Metrics
+- Update latency < 100ms
+- CPU usage < 1%
+- Memory usage < 50MB
+- Package size < 15KB
 
-## 8. 成功指标
+### 8.3 Adoption Metrics
+- npm package downloads
+- GitHub stars and forks
+- Community contributions
+- User retention rate
 
-### 8.1 功能指标
-- ✅ 准确显示 5h 窗口使用情况
-- ✅ 宠物状态反映实时消耗速率
-- ✅ 用户能直观了解剩余可用量
-- ✅ 5 分钟内完成安装配置
+## 9. User Feedback Collection
 
-### 8.2 性能指标
-- 更新延迟 <100ms
-- CPU 占用 <1%
-- 内存占用 <50MB
+### 9.1 Feedback Channels
+- GitHub Issues and Discussions
+- npm package reviews
+- Community forums
+- Direct user reports
 
-## 9. 用户反馈收集
+### 9.2 Focus Areas
+- Pet behavior preferences
+- Information display priorities
+- Performance impact assessment
+- Feature requests and suggestions
+- Multi-platform expansion needs
 
-### 9.1 反馈渠道
-- GitHub Issues
-- 产品内提示
-- 社区讨论
+## 10. Project Summary
 
-### 9.2 关注点
-- 宠物形象喜好
-- 信息展示优先级
-- 性能影响
-- 功能建议
+Claude Code Status Line has successfully evolved from a single-purpose plugin to a professional monorepo architecture supporting multiple platforms. Through creative pet-themed visualization, it transforms boring data monitoring into an engaging and delightful experience.
 
-## 10. 项目总结
+### Technical Highlights
+- **Professional npm Distribution**: Global installation via `npm install -g claude-code-statusline`
+- **Monorepo Architecture**: Scalable structure supporting multiple platforms
+- **Modular Design**: Shared core library for code reusability
+- **Direct Integration**: ccusage module imports for optimal performance
+- **Graceful Degradation**: Robust fallback mechanisms
+- **International Support**: English interface for global accessibility
+- **Comprehensive Testing**: Automated test suite ensuring reliability
 
-CC Pet Statusline 成功实现了将 Claude Code token 使用可视化的目标。通过宠物精灵的创意形式，让原本枯燥的数据监控变得生动有趣。项目采用轻量级架构，确保对用户系统的影响最小，同时提供了准确实时的使用情况反馈。
+### Product Innovation
+- **First Dynamic Pet-Themed Claude Code Status Bar**: Pioneering the use of animated emoji pets
+- **Living Digital Pet Experience**: Truly reactive pet companions that respond to usage patterns
+- **Emotional Token Visualization**: Innovative approach to making abstract data tangible
+- **Multi-Platform Vision**: Extensible architecture for tmux, zsh, vim, and more
+- **Community-Driven Development**: Open source approach encouraging contributions
 
-### 技术亮点
-- 巧妙利用 Claude Code 官方 status line API
-- 双数据源策略确保稳定性
-- 智能静止检测算法（基于 transcript 文件时间戳）
-- 动态状态机系统（7种基础状态+5种特殊状态）
-- 疲劳算法模拟真实猫咪行为
-- 优雅的降级处理机制
-- 轻量级无侵入式设计
-
-### 产品创新
-- 首个动态宠物主题的 Claude Code 状态栏
-- 真正的"活着"的数字宠物猫体验
-- 创新的 token 消耗情感化可视化
-- 智能行为模式：工作时活跃，静止时睡觉
-- 多层次动画系统营造生命感
+### Architecture Evolution
+- **V1.0**: Single file implementation with Chinese interface
+- **V1.1**: Monorepo structure with international English support ✅ (Current)
+- **V2.0**: Multi-platform expansion (tmux, zsh, vim)
+- **V3.0**: Advanced features (web dashboard, community gallery)
 
 ---
 
-*文档版本：1.0.0*  
-*更新日期：2025-09-04*  
-*作者：Claude Code Assistant*
+*Document Version: 2.0.0*  
+*Last Updated: 2025-09-07*  
+*Architecture: Monorepo with npm workspaces*  
+*Status: Production Ready*

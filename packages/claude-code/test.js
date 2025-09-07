@@ -5,7 +5,7 @@ import { spawn } from 'child_process';
 // Test cases with different scenarios
 const testCases = [
   {
-    name: 'Low usage (睡觉中)',
+    name: 'Low usage (resting)',
     data: {
       session_id: 'test-session-1',
       model: { id: 'claude-3-opus', display_name: 'Claude 3 Opus' },
@@ -18,7 +18,7 @@ const testCases = [
     }
   },
   {
-    name: 'Medium usage (运动中)',
+    name: 'Medium usage (active)',
     data: {
       session_id: 'test-session-2',
       model: { id: 'claude-3-opus', display_name: 'Claude 3 Opus' },
@@ -31,7 +31,7 @@ const testCases = [
     }
   },
   {
-    name: 'High usage (疯狂中)',
+    name: 'High usage (intense)',
     data: {
       session_id: 'test-session-3',
       model: { id: 'claude-3-opus', display_name: 'Claude 3 Opus' },
@@ -44,7 +44,7 @@ const testCases = [
     }
   },
   {
-    name: 'Near limit (累坏了)',
+    name: 'Near limit (exhausted)',
     data: {
       session_id: 'test-session-4',
       model: { id: 'claude-3-opus', display_name: 'Claude 3 Opus' },
